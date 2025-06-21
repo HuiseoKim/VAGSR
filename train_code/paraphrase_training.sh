@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # 환경 설정
-export WANDB_API_KEY="e2842519a3c374738702df8f4d932fbefd498de6"  # Wandb API 키 설정
+export WANDB_API_KEY="your_key"  # Wandb API 키 설정
 export WANDB__SERVICE_WAIT="300"  # WANDB 연결 시간 최대 300초로 설정
 export TOKENIZERS_PARALLELISM="false"  # 토크나이저 병렬 처리 방지
 
