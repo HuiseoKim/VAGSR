@@ -36,18 +36,19 @@ VAGSR_Inference/
 #### A. `inference_code/` - 벡터 기반 RAG (메인 추론 시스템)
 - **기능**: 확신도 기반 적응적 벡터 검색
 - **검색 방식**: FAISS 인덱스를 통한 고속 벡터 유사도 검색
-- **확신도 임계값**: 모델 확신도가 낮을 때만 RAG 수행하여 효율성 증대
+- **Confidence Threshold**: 모델 확신도가 낮을 때만 RAG 수행하여 효율성 증대
 
 #### B. `inference_naive_RAG/` - 텍스트 기반 Naive RAG
 - **기능**: 전통적인 텍스트 기반 RAG 추론
 - **검색 방식**: 텍스트 검색 후 컨텍스트로 추가
+- **Confidence Threshold**: 모델 확신도가 낮을 때만 RAG 수행하여 효율성 증대 (VAGSR과 RAG trigger은 동일하게 적용)
 
 #### C. `inference_code_noRAG/` - RAG 없는 순수 추론
 - **기능**: RAG 없이 순수 LLM 추론만 수행
 - **용도**: 베이스라인 성능 비교
 
 ### 3. 데이터 (`data/`)
-- **task/**: ASQA, BBEH 영화 추천, 스포츠 QA, Linguini 등 다양한 태스크 데이터
+- **task/**: Movie Recommendation, Sports QA, Linguini 등 다양한 태스크 데이터
 - **faiss/**: 벡터 검색을 위한 FAISS 인덱스 파일
 - **parameter/**: 훈련된 프로젝터 가중치 파일
 
@@ -59,12 +60,6 @@ VAGSR_Inference/
 - 16GB+ GPU 메모리 권장
 
 ### 주요 의존성
-```bash
-pip install torch pytorch-lightning transformers
-pip install sentence-transformers faiss-cpu vllm
-pip install wandb tqdm pytz
-```
-
 ## 🛠️ 사용법
 
 ### 1. 모델 훈련
@@ -76,19 +71,19 @@ bash paraphrase_training.sh
 ### 2. 벡터 RAG 추론 (메인)
 ```bash
 cd inference_code
-bash run_inference.sh --dataset movie --confidence_threshold 0.4
+bash run_inference.sh
 ```
 
 ### 3. Naive RAG 추론
 ```bash
 cd inference_naive_RAG
-bash run_inference.sh --dataset asqa --max_samples 10
+bash run_inference.sh
 ```
 
 ### 4. No RAG 추론 (베이스라인)
 ```bash
 cd inference_code_noRAG  
-bash run_inference.sh --dataset sport --temperature 0.7
+bash run_inference.sh
 ```
 
 ## ⚙️ 주요 매개변수
@@ -97,14 +92,14 @@ bash run_inference.sh --dataset sport --temperature 0.7
 - `--model_name`: 베이스 LLM 모델 (기본: DeepSeek-R1-Distill-Llama-8B)
 - `--hidden_size`: 프로젝터 히든 사이즈 (기본: 4096)
 - `--batch_size`: 배치 크기
-- `--lr`: 학습률 (기본: 3e-5)
+- `--lr`: 학습률
 - `--max_epochs`: 최대 에포크 수
 
 ### 추론 매개변수
-- `--confidence_threshold`: 확신도 임계값 (낮을수록 더 자주 RAG 수행)
-- `--max_length`: 최대 생성 길이 (기본: 8192)
-- `--temperature`: 생성 temperature (기본: 0)
-- `--dataset`: 데이터셋 타입 (asqa, sport, movie, linguini)
+- `--confidence_threshold`: 확신도 임계값
+- `--max_length`: 최대 생성 길이
+- `--temperature`: 생성 temperature
+- `--dataset`: 데이터셋 타입 (sport, movie, linguini)
 
 ## 🔍 핵심 기술적 특징
 
@@ -126,9 +121,8 @@ bash run_inference.sh --dataset sport --temperature 0.7
 - 확신도 임계값 조정을 통한 RAG 빈도 제어
 
 ## 📊 지원 데이터셋
-- **ASQA**: Answer Sentence Question Answering
-- **BBEH 영화 추천**: 영화 추천 대화 데이터
-- **BBEH 스포츠 QA**: 스포츠 관련 질문 답변
+- **BBEH Movie Recommendation**: 영화 추천 대화 데이터
+- **BBEH Sports QA**: 스포츠 관련 질문 답변
 - **BBEH Linguini**: 언어학적 질문 답변
 
 ## 📈 성능 및 로깅
@@ -137,11 +131,6 @@ bash run_inference.sh --dataset sport --temperature 0.7
 - **결과 저장**: JSON 형태로 추론 결과 및 메타데이터 저장
 
 ## 🔧 개발 및 디버깅
-- 디버깅 모드 지원
 - 샘플 수 제한 기능으로 빠른 테스트 가능
 - GPU 메모리 사용량 최적화
 - 자동 패키지 설치 및 환경 설정
-
----
-
-이 프로젝트는 벡터 기반 RAG 시스템의 효율적인 구현을 통해 질문 답변, 추천 시스템, 대화 생성 등 다양한 NLP 태스크에서 높은 성능을 달성하는 것을 목표로 합니다. 
